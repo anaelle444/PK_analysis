@@ -1,0 +1,13 @@
+Identifier,StructureData,,,Polymer EntityData,,,,,AssemblyData,,Non-polymer EntityData,,OligosaccharideData,
+Entry ID,Experimental Method,Ligand,PDB ID,Entity Polymer Type,Source Organism,Taxonomy ID,EC Number,Entity ID,Total Number of Polymer Instances (Chains) per Assembly,Assembly ID,Ligand Name,Asym ID,Entity ID,
+"2KUP","SOLUTION NMR",,"2KUP","Protein","Homo sapiens",9606,,"1",2,"1"
+,,,,"Protein",,,"2.7.10.1","2"
+,,,,,"Homo sapiens",9606
+"2KUQ","SOLUTION NMR",,"2KUQ","Protein","Homo sapiens",9606,"2.7.10.1","1",1,"1"
+,,,,,"synthetic construct",32630
+,,,,,"Homo sapiens",9606
+"2YS5","SOLUTION NMR",,"2YS5","Protein","Homo sapiens",9606,,"1",2,"1"
+,,,,"Protein",,,"2.7.10.1","2"
+,,,,,"Homo sapiens",9606
+"2YT2","SOLUTION NMR",,"2YT2","Protein","Homo sapiens",9606,"2.7.10.1","1",1,"1"
+"7MZW","SOLUTION NMR",,"7MZW","Protein","Homo sapiens",9606,"2.7.10.1","1",1,"1"
