@@ -21,7 +21,7 @@ def load_from_csv(filename):
             
             count = 0
             for row in reader:
-                entry_id = row.get("Entry ID")
+                entry_id = row.get("PDB ID")
                 if entry_id:
                     print(f"Récupération de : {entry_id}...")
                     cmd.fetch(entry_id)

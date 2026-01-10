@@ -1,23 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Script de test pour la superposition de quelques structures ALK sur PKACA
-À utiliser pour vérifier que tout fonctionne avant de traiter toutes les structures
+Test pour la superposition de peu de structures sur PKACA
+-> vérifier que tout fonctionne avant de traiter toutes les structures
 """
 
 import csv
 from pymol import cmd
 
-# Limiter le nombre de structures à tester
+# limiter le nombre de structures à tester
 MAX_STRUCTURES = 3
 
-# Fichier CSV
+# le fichier CSV
 csv_file = "smaller5.csv"  # ou "rcsb_pdb_custom_report_20260109152453.csv"
 
-# Structure de référence PKACA (P17612)
+# structure de référence PKACA (P17612) donnée dans le sujet
 reference_pdb = "1ATP"
 reference_chain = "E"
 
+# LOBE C
 # Positions connues du LOBE C pour PKACA (1ATP chaîne E)
 # Basées sur la structure des kinases: le lobe C commence après le hinge (~120-130)
 # et s'étend jusqu'à la fin du domaine catalytique (~300)
@@ -32,7 +33,7 @@ print(f"  Référence PKACA ({reference_pdb} chaîne {reference_chain})")
 print(f"  Lobe C: résidus {PKACA_LOBE_C_START}-{PKACA_LOBE_C_END}")
 print("="*60)
 
-# Charger la structure de référence
+# 1. charger la structure de référence
 print(f"\nChargement de la structure de référence {reference_pdb}...")
 try:
     # Utiliser fetch_mmcif comme commande PyMOL (pas cmd.fetch_mmcif)
@@ -55,7 +56,7 @@ n_atoms_lobe_c = cmd.count_atoms(lobe_c_ref)
 
 if n_atoms_lobe_c == 0:
     print(f"⚠ ERREUR: Aucun atome trouvé dans le lobe C (résidus {PKACA_LOBE_C_START}-{PKACA_LOBE_C_END})")
-    print("  Vérifiez la chaîne et les numéros de résidus!")
+    print(" !! Vérifiez la chaîne et les numéros de résidus !!")
     exit(1)
 
 print(f"✓ Lobe C de la référence: {n_atoms_lobe_c} C-alpha (résidus {PKACA_LOBE_C_START}-{PKACA_LOBE_C_END})")
@@ -69,6 +70,7 @@ print("="*60)
 count = 0
 results = []
 
+# 2. chargement des structures du csv et alignement sur la ref
 with open(csv_file, newline='') as f:
     lines = f.readlines()
     reader = csv.DictReader(lines[1:])
@@ -89,10 +91,12 @@ with open(csv_file, newline='') as f:
             obj_name = f"{entry_id}_assembly1"
             
             # Charger l'assemblage biologique avec fetch_mmcif
+            # assemblage biologique !!
+            # commande fetch_mmcif du pr. trapani
             cmd.do(f"fetch_mmcif {entry_id}, {obj_name}, 1")
             cmd.remove(f"{obj_name} and solvent")
             
-            # Identifier la chaîne principale
+            # identifier la chaîne principale
             chains = cmd.get_chains(obj_name)
             print(f"Chaînes disponibles: {', '.join(chains)}")
             
@@ -113,6 +117,8 @@ with open(csv_file, newline='') as f:
             print(f"➜ Chaîne sélectionnée: {target_chain} ({max_residues} résidus)")
             
             # Stratégie de superposition optimisée sur le LOBE C uniquement
+
+            # a. alignement sur toute la protéine
             print("\nÉtape 1: Alignement initial sur toute la protéine...")
             global_sel = f"{obj_name} and chain {target_chain} and name CA"
             ref_global = f"{reference_pdb}_ref and chain {reference_chain} and name CA"
@@ -126,7 +132,7 @@ with open(csv_file, newline='') as f:
             )
             print(f"  Pré-alignement global: RMSD={pre_align[0]:.2f} Å, {pre_align[1]} atomes")
             
-            # Étape 2: Identifier la région du lobe C dans la structure cible
+            # b. identifier la région du lobe C dans la structure cible a partir de la ref
             print(f"\nÉtape 2: Identification de la région correspondant au lobe C...")
             print(f"  Référence PKACA lobe C: résidus {PKACA_LOBE_C_START}-{PKACA_LOBE_C_END}")
             
