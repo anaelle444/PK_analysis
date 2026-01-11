@@ -9,7 +9,7 @@ import os
 from pymol import cmd
 
 # CSV contenant les structures PDB
-csv_file = "rcsb_pdb_custom_report_20260110111300_new.csv"
+csv_file = "rcsb_pdb_custom_report.csv"
 # a commenter si on veut charger et aligner toutes les structures du CSV
 # MAX_STRUCTURES = 10
 

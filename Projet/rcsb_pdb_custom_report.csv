@@ -117,13 +117,9 @@ Assembly ID,PDB ID,Entity Polymer Type,Polymer Entity Sequence Length,Asym ID,Au
 7JYT-1,7JYT,Protein,322,A,A,1,7JYT,Q9UM73,GOL,GLYCEROL,2,B,A,1,1,Monomer
 ,,,,,,,,,VRM,3-(3-methyl-1H-pyrazol-5-yl)pyridine,3,C,A,,,
 7LRZ-1,7LRZ,Protein,311,A,A,1,7LRZ,Q9UM73,,,,,,1,1,Monomer
-7LS0-1,7LS0,Protein,451,A,A,1,7LS0,"Q6UX46, Q9UM73",NAG,2-acetamido-2-deoxy-beta-D-glucopyranose,3,G,D,2,1,Homo 2-mer
+7LS0-1,7LS0,Protein,451,A,A,1,7LS0,Q9UM73,NAG,2-acetamido-2-deoxy-beta-D-glucopyranose,3,G,D,2,1,Homo 2-mer
 ,,,,B,B,,,,CIT,CITRIC ACID,2,E,A,,,
 ,,,,C,C,,,,,,,F,A,,,
-,,,,D,D,,,,,,,,,,,
-7LS0-2,7LS0,Protein,451,A,A,1,7LS0,"Q6UX46, Q9UM73",CIT,CITRIC ACID,2,E,A,2,2,Homo 2-mer
-,,,,B,B,,,,,,,F,A,,,
-,,,,C,C,,,,NAG,2-acetamido-2-deoxy-beta-D-glucopyranose,3,G,D,,,
 ,,,,D,D,,,,,,,,,,,
 7MZW-1,7MZW,Protein,353,A,A,1,7MZW,Q9UM73,,,,,,1,1,Monomer
 7MZY-1,7MZY,Protein,315,A,A,1,7MZY,Q9UM73,ACT,ACETATE ION,2,C,A,2,1,Homo 2-mer
@@ -138,12 +134,6 @@ Assembly ID,PDB ID,Entity Polymer Type,Polymer Entity Sequence Length,Asym ID,Au
 ,,,,C,E,,,,,,,J,B,,,
 ,,,,D,B,,,,,,,I,B,,,
 ,,,,E,A,,,,,,,H,E,,,
-7NWZ-2,7NWZ,Protein,81,A,D,1,7NWZ,Q6UX46,NAG,2-acetamido-2-deoxy-beta-D-glucopyranose,3,G,F,3,2,"Hetero 3-mer, Homo 2-mer"
-,,,,F,C,,,,,,,H,E,,,
-,,Protein,344,B,F,2,7NWZ,Q9UM73,,,,I,B,,,
-,,,,C,E,,,,,,,J,B,,,
-,,,,D,B,,,,,,,K,B,,,
-,,,,E,A,,,,,,,L,A,,,
 7NX3-1,7NX3,Protein,218,C,C,3,7NX3,,NAG,2-acetamido-2-deoxy-beta-D-glucopyranose,4,G,A,3,1,Hetero 3-mer
 ,,,,D,D,,,,,,,H,A,,,
 ,,Protein,231,B,B,2,7NX3,,,,,I,A,,,
@@ -152,14 +142,6 @@ Assembly ID,PDB ID,Entity Polymer Type,Polymer Entity Sequence Length,Asym ID,Au
 ,,,,F,F,,,,,,,M,F,,,
 ,,,,,,,,,,,,N,F,,,
 ,,,,,,,,,,,,J,A,,,
-7NX3-2,7NX3,Protein,389,A,A,1,7NX3,Q9UM73,NAG,2-acetamido-2-deoxy-beta-D-glucopyranose,4,G,A,3,2,Hetero 3-mer
-,,,,F,F,,,,,,,H,A,,,
-,,Protein,231,B,B,2,7NX3,,,,,I,A,,,
-,,,,E,E,,,,,,,J,A,,,
-,,Protein,218,C,C,3,7NX3,,,,,K,F,,,
-,,,,D,D,,,,,,,L,F,,,
-,,,,,,,,,,,,M,F,,,
-,,,,,,,,,,,,N,F,,,
 7NX4-1,7NX4,Protein,389,A,A,1,7NX4,Q9UM73,ZN,ZINC ION,3,F,A,1,1,Monomer
 ,,,,,,,,,NI,NICKEL (II) ION,4,H,A,,,
 ,,,,,,,,,,,,G,A,,,

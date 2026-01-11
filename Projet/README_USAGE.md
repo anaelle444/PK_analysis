@@ -11,7 +11,7 @@ Ce projet permet de charger automatiquement les assemblages biologiques de struc
 - **`visualisation.py`** : Script de visualisation pour mettre en évidence les régions d'alignement et identifier les structures problématiques
 
 ### Fichiers de données
-- **`rcsb_pdb_custom_report_20260110111300_new.csv`** : Liste complète des structures PDB contenant ALK
+- **`rcsb_pdb_custom_report.csv`** : Liste complète des structures PDB contenant ALK
 - **`superposition_results.csv`** : Résultats générés par le script principal (RMSD, nombre de C-alpha alignés, statut)
 
 ## Prérequis
