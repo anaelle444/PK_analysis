@@ -41,11 +41,10 @@ Le projet est organisé en plusieurs fichiers :
 
 ```
 Projet/
-├── open-csv.py                              # Script principal (PyMOL)
-├── generate_report.py                       # Génération du rapport (Python)
+├── open_pdb_csv.py                                # Script principal (PyMOL)
 ├── rcsb_pdb_custom_report_20260110111300_new.csv  # Liste des structures ALK
-├── superposition_results.csv                # Résultats bruts
-└── rapport_resultats.md                     # Rapport final
+├── superposition_results.csv                      # Résultats bruts
+└── rapport_resultats.md                           # Rapport final
 
 Super/
 ├── 4WB8-assembly1.cif                       # Structure de référence PKACA
@@ -63,10 +62,10 @@ Super/
 pymol
 
 # Dans PyMOL, exécuter le script
-run Projet/open-csv.py
+run Projet/open_pdb_csv.py
 ```
 
-Le script va :
+Ce script va :
 - Charger la structure de référence 4WB8
 - Lire le fichier CSV contenant les structures ALK
 - Pour chaque structure :

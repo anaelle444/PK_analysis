@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
-Script complet pour charger et superposer toutes les structures ALK sur PKACA
+charger et superposer toutes les structures ALK sur PKACA
 Utilise fetch_mmcif pour les assemblages biologiques
 Alignement sur le LOBE C uniquement
 """
@@ -10,54 +8,47 @@ import csv
 import os
 from pymol import cmd
 
-# Fichier CSV contenant les structures PDB
+# CSV contenant les structures PDB
 csv_file = "rcsb_pdb_custom_report_20260110111300_new.csv"
+# a commenter si on veut charger et aligner toutes les structures du CSV
+# MAX_STRUCTURES = 10
 
-# Structure de référence PKACA HUMAINE (P17612)
-# 4WB8 : PKACA humaine (Homo sapiens), résolution 1.55 Å
-# UniProt: P17612 - cAMP-dependent protein kinase catalytic subunit alpha
-# Référence: Cheung et al. (2015) PNAS 112: 1374-1379
-# Structure: résidus 14-350 (délétion exon 1)
+# Reference PKACA humaine (P17612)
+
 reference_pdb = "4WB8"
 reference_chain = "A"
 reference_uniprot = "P17612"
 
-# Positions du LOBE C pour 4WB8
-# Le lobe C commence après la hinge region (~127) et s'étend jusqu'à ~350
+# LOBE C de la reference 
+# Le lobe C de 4WB8 commence après la region hinge 127 et s'étend jusqu'à 350
 PKACA_LOBE_C_START = 127
-PKACA_LOBE_C_END = 350  # Correction: fin du domaine catalytique
+PKACA_LOBE_C_END = 350 
 
 print("=" * 60)
 print("CHARGEMENT DE LA STRUCTURE DE RÉFÉRENCE PKACA")
 print("=" * 60)
 print(f"Protéine: PKACA humaine (Homo sapiens)")
-print(f"  UniProt: {reference_uniprot}")
-print(f"  Structure PDB: {reference_pdb} chaîne {reference_chain}")
-print(f"  Résolution: 1.55 Å")
-print(f"  Référence: Cheung et al. (2015) PNAS 112: 1374-1379")
-print(f"  Résidus présents: 14-350 (délétion exon 1)")
-print(f"Alignement sur le LOBE C uniquement:")
 print(f"  Lobe C: résidus {PKACA_LOBE_C_START}-{PKACA_LOBE_C_END}")
 print("=" * 60)
 
-# Charger la structure de référence (assemblage biologique 1)
+# charger la structure de référence (assemblage biologique 1)
 print(f"\nChargement de la structure de référence {reference_pdb}...")
 try:
-    # Supprimer l'objet s'il existe déjà
+    # supprimer l'objet s'il existe déjà
     if f"{reference_pdb}_ref" in cmd.get_names():
         cmd.delete(f"{reference_pdb}_ref")
-        print(f"✓ Objet existant {reference_pdb}_ref supprimé")
+        print(f"🕺🏻 Objet existant {reference_pdb}_ref supprimé")
     
-    # Vérifier si le fichier existe localement
+    # vérifier si le fichier existe localement pour eviter de le retelecharger a chaque fois
     ref_file = f"{reference_pdb}-assembly1.cif"
     if os.path.exists(ref_file):
-        print(f"✓ Fichier local trouvé: {ref_file}")
+        print(f"🕺🏻 Fichier local trouvé: {ref_file}")
         cmd.load(ref_file, f"{reference_pdb}_ref")
     else:
         cmd.do(f"fetch_mmcif {reference_pdb}, {reference_pdb}_ref, 1")
     
     cmd.remove(f"{reference_pdb}_ref and solvent")
-    print(f"✓ {reference_pdb} chargé")
+    print(f"🕺🏻 {reference_pdb} chargé")
 
     # Afficher des informations sur la structure
     n_chains = len(cmd.get_chains(f"{reference_pdb}_ref"))
@@ -65,20 +56,20 @@ try:
     print(f"  Chaînes: {n_chains}, Résidus totaux dans chaîne {reference_chain}: {n_residues}")
 
 except Exception as e:
-    print(f"✗ Erreur: {e}")
+    print(f"🙈 erreur : {e}")
     exit(1)
 
-# Définir le LOBE C de la référence PKACA avec les positions connues
+# définir le LOBE C de la référence PKACA avec les positions connues
 lobe_c_ref = f"{reference_pdb}_ref and chain {reference_chain} and resi {PKACA_LOBE_C_START}-{PKACA_LOBE_C_END} and name CA"
 n_atoms_lobe_c = cmd.count_atoms(lobe_c_ref)
 
 if n_atoms_lobe_c == 0:
-    print(f"⚠ ERREUR: Aucun atome trouvé dans le lobe C (résidus {PKACA_LOBE_C_START}-{PKACA_LOBE_C_END})")
-    print("  Vérifiez la chaîne et les numéros de résidus!")
+    print(f"🙈 erreur : aucun atome trouvé dans le lobe C (résidus {PKACA_LOBE_C_START}-{PKACA_LOBE_C_END})")
+    print(" !!Vérifiez la chaîne et les numéros de résidu!s!")
     exit(1)
 
-print(f"✓ Lobe C de la référence: {n_atoms_lobe_c} C-alpha (résidus {PKACA_LOBE_C_START}-{PKACA_LOBE_C_END})")
-print(f"  Tous les alignements seront faits sur cette région uniquement.")
+print(f" Lobe C de la référence: {n_atoms_lobe_c} C-alpha (résidus {PKACA_LOBE_C_START}-{PKACA_LOBE_C_END})")
+print(f" Tous les alignements seront faits sur cette région uniquement.")
 
 # Configuration visuelle pour vérification
 cmd.hide("everything", f"{reference_pdb}_ref")
@@ -87,6 +78,8 @@ cmd.color("green", f"{reference_pdb}_ref")
 cmd.show("sticks", f"{reference_pdb}_ref and organic")
 cmd.show("nb_spheres", f"{reference_pdb}_ref and inorganic")
 
+
+# les structures : 
 print("\n" + "=" * 60)
 print("TRAITEMENT DES STRUCTURES ALK")
 print("=" * 60)
@@ -97,14 +90,16 @@ count = 0
 
 # Parcourir le CSV en sautant la première ligne (en-têtes de section)
 with open(csv_file, newline='') as f:
-    # Lire toutes les lignes
+    # lire toutes les lignes
     lines = f.readlines()
-    
-    # Sauter la première ligne (en-têtes de section)
-    # La deuxième ligne contient les vrais en-têtes
     reader = csv.DictReader(lines[1:])
 
     for row in reader:
+#ICI POUR CHANGER LA TAILLE DU DATASET
+        # if count >= MAX_STRUCTURES:
+        #     break
+            
+
         entry_id = row["PDB ID"]
         assembly_id = row["Assembly ID"]
         chain_id = row["Auth Asym ID"]
@@ -126,14 +121,14 @@ with open(csv_file, newline='') as f:
             # Vérifier si le fichier existe avant de télécharger
             structure_file = f"{entry_id}-assembly{assembly_id}.cif"
             if os.path.exists(structure_file):
-                print(f"✓ Structure déjà présente: {structure_file}, chargement depuis le fichier local")
+                print(f"🕺🏻 Structure déjà présente: {structure_file}, chargement depuis le fichier local")
                 cmd.load(structure_file, obj_name)
             else:
                 print(f"Téléchargement de la structure {entry_id}...")
                 cmd.do(f"fetch_mmcif {entry_id}, {obj_name}, {assembly_id}")
             
             cmd.remove(f"{obj_name} and solvent")
-            print(f"✓ Structure chargée")
+            print(f"🕺🏻 Structure chargée")
 
             # Configuration visuelle
             cmd.hide("everything", obj_name)
@@ -147,12 +142,12 @@ with open(csv_file, newline='') as f:
             n_atoms_target = cmd.count_atoms(lobe_c_target)
 
             if n_atoms_target < 20:
-                print(f"⚠ Peu d'atomes trouvés dans le lobe C ({n_atoms_target}). Utilisation de tous les C-alpha.")
+                print(f"🙈 Peu d'atomes trouvés dans le lobe C ({n_atoms_target}). Utilisation de tous les C-alpha.")
                 lobe_c_target = f"{obj_name} and chain {chain_id} and name CA"
                 n_atoms_target = cmd.count_atoms(lobe_c_target)
 
             if n_atoms_target == 0:
-                print(f"⚠ Aucun atome trouvé dans {entry_id}. Structure peut être incomplète.")
+                print(f"🙈 erreur : Aucun atome trouvé dans {entry_id}. Structure peut être incomplète.")
                 results.append({
                     'PDB_ID': entry_id,
                     'Chain': 'ERROR',
@@ -176,28 +171,28 @@ with open(csv_file, newline='') as f:
             rmsd = alignment[0]
             n_aligned = alignment[1]
 
-            print(f"✓ Résultats finaux:")
+            print(f"🕺🏻 Résultats finaux:")
             print(f"  RMSD: {rmsd:.2f} Å")
             print(f"  C-alpha alignés: {n_aligned}")
 
             # Évaluation détaillée
             if rmsd > 4.0:
-                print(f"  ⚠ RMSD élevé - Vérifier manuellement!")
+                print(f"  🙈 RMSD élevé - Vérifier manuellement!")
                 status = "HIGH_RMSD"
             elif rmsd > 2.5:
-                print(f"  ⚠ RMSD modéré - Acceptable mais vérifier")
+                print(f"  🙈 RMSD modéré - Acceptable mais vérifier")
                 status = "MODERATE"
             elif rmsd < 2.0:
-                print(f"  ✓ Excellente superposition!")
+                print(f"  🕺🏻 Excellente superposition!")
                 status = "EXCELLENT"
             else:
-                print(f"  ✓ Bonne superposition")
+                print(f"  🕺🏻 Bonne superposition")
                 status = "GOOD"
 
             if n_aligned < 50:
-                print(f"  ⚠ Peu d'atomes alignés - Structures très différentes?")
+                print(f"  🙈 Peu d'atomes alignés - Structures très différentes?")
             elif n_aligned > 100:
-                print(f"  ✓ Bon nombre d'atomes alignés")
+                print(f"  🕺🏻 Bon nombre d'atomes alignés")
 
             # Sauvegarder les résultats
             results.append({
@@ -210,10 +205,10 @@ with open(csv_file, newline='') as f:
 
             # Sauvegarder la structure superposée au format mmcif
             cmd.save(f"{entry_id}_aligned.cif", obj_name)
-            print(f"  💾 Sauvegardé: {entry_id}_aligned.cif")
+            print(f"  ✨ Sauvegardé : {entry_id}_aligned.cif")
 
         except Exception as e:
-            print(f"✗ Erreur: {e}")
+            print(f"🙈 erreur : {e}")
             results.append({
                 'PDB_ID': entry_id,
                 'Chain': 'ERROR',
@@ -237,7 +232,7 @@ with open(output_csv, 'w', newline='') as f:
     writer.writeheader()
     writer.writerows(results)
 
-print(f"\n✓ Résultats sauvegardés dans {output_csv}")
+print(f"\n🕺🏻 Résultats sauvegardés dans {output_csv}")
 
 # Statistiques
 n_total = len(results)
@@ -255,9 +250,9 @@ print(f"  Excellent (RMSD < 2.0 Å): {n_excellent}")
 print(f"  Bon (RMSD 2.0-2.5 Å): {n_good}")
 print(f"  Modéré (RMSD 2.5-4.0 Å): {n_moderate}")
 print(f"  RMSD élevé (> 4.0 Å): {n_high_rmsd}")
-print(f"  Erreurs: {n_errors}")
+print(f"  🙈 erreur : {n_errors}")
 
 print("\n" + "=" * 60)
-print("TRAITEMENT TERMINÉ ✨")
+print("✨ TRAITEMENT TERMINÉ ✨")
 print("=" * 60)
 

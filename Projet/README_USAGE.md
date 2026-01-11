@@ -1,18 +1,18 @@
+```markdown
 # Projet de Superposition de Structures ALK sur PKACA
 
 ## Description
-Ce projet permet de charger automatiquement les assemblages biologiques de structures PDB contenant la protéine kinase ALK (Q9UM73) et de les superposer sur une structure de référence PKACA (P17612).
+Ce projet permet de charger automatiquement les assemblages biologiques de structures PDB contenant la protéine kinase ALK (Q9UM73) et de les superposer sur une structure de référence PKACA (P17612, structure 4WB8).
 
 ## Fichiers du projet
 
 ### Scripts Python pour PyMOL
-- **`test_superposition.py`** : Script de test qui traite seulement 3 structures (recommandé pour débuter)
-- **`open-csv.py`** : Script principal qui traite toutes les structures du CSV
-- **`import_csv.py`** : (À vérifier/adapter selon vos besoins)
+- **`open_pdb_csv.py`** : Script principal qui charge et superpose toutes les structures ALK sur PKACA
+- **`visualisation.py`** : Script de visualisation pour mettre en évidence les régions d'alignement et identifier les structures problématiques
 
 ### Fichiers de données
-- **`rcsb_pdb_custom_report_20260109152453.csv`** : Liste complète des structures PDB
-- **`smaller5.csv`** : Liste réduite pour les tests (si disponible)
+- **`rcsb_pdb_custom_report_20260110111300_new.csv`** : Liste complète des structures PDB contenant ALK
+- **`superposition_results.csv`** : Résultats générés par le script principal (RMSD, nombre de C-alpha alignés, statut)
 
 ## Prérequis
 
@@ -38,135 +38,211 @@ Si l'aide s'affiche, l'extension est correctement installée.
 
 ## Utilisation
 
-### 1. Test initial (RECOMMANDÉ)
-Commencez par tester avec quelques structures :
+### 1. Superposition des structures
 
 ```bash
-# Dans PyMOL
-cd /home/najat/Master_bioinformatique/M2/Structure_medicament/projet_stefano/PK_analysis/Projet
-run test_superposition.py
+# Lancer PyMOL
+pymol
+
+# Dans PyMOL, exécuter le script principal
+run open_pdb_csv.py
 ```
 
 Ce script :
-- Charge 3 structures seulement
-- Affiche des informations détaillées
-- Permet de vérifier que tout fonctionne correctement
+- Charge la structure de référence 4WB8 (PKACA humaine)
+- Parcourt le fichier CSV contenant toutes les structures ALK
+- Pour chaque structure :
+  - Télécharge l'assemblage biologique 1 (ou charge depuis le cache local)
+  - Supprime les molécules d'eau et solvants
+  - Superpose le lobe C (résidus 127-350) sur celui de PKACA
+  - Calcule le RMSD et le nombre de C-alpha alignés
+  - Sauvegarde la structure superposée au format mmCIF
+- Génère un fichier CSV avec tous les résultats
+- Affiche des statistiques détaillées
 
-### 2. Traitement complet
-Une fois le test validé, lancez le traitement complet :
+**Note :** Pour limiter le nombre de structures traitées (utile pour les tests), décommenter et ajuster dans le script :
+```python
+MAX_STRUCTURES = 10  # Traiter seulement 10 structures
+```
+
+### 2. Visualisation des résultats
+
+Après avoir exécuté le script principal, chargez le script de visualisation :
 
 ```bash
 # Dans PyMOL
-run open-csv.py
+run visualisation.py
 ```
 
-Ce script :
-- Parcourt tout le fichier CSV
-- Charge chaque assemblage biologique (assembly 1)
-- Identifie automatiquement la chaîne de la kinase
-- Superpose sur le lobe C de PKACA
-- Sauvegarde les structures alignées au format mmcif
-- Génère un fichier de résultats CSV
+Ce script fournit trois fonctions :
+
+#### a) Mise en évidence du lobe C et de la région charnière
+```python
+highlight_lobes
+```
+- Colore le lobe C en **saumon** (résidus 1202-1383)
+- Colore la région charnière en **orange** (résidus 1197-1201)
+- Permet de visualiser clairement la région utilisée pour l'alignement
+
+#### b) Coloration des structures problématiques
+```python
+color_bad_rmsd("superposition_results.csv")
+```
+- Colore en **marron** les structures avec RMSD > 4 Å
+- Colore en **gris** les structures en erreur
+- S'exécute automatiquement au chargement du script
+
+#### c) Isolation des structures problématiques
+```python
+isoler_mauvais
+```
+- Masque toutes les structures bien alignées
+- Affiche uniquement les structures avec RMSD > 4 Å ou en erreur
+- Zoome sur ces structures pour inspection visuelle
 
 ## Sorties générées
 
+### Structure de référence
+- `4WB8-assembly1.cif` : Structure de référence PKACA (si téléchargée)
+
 ### Fichiers de structures superposées
-- `<PDB_ID>_aligned.cif` : Structures superposées au format mmcif
-- À copier dans le dossier `Super/` pour le rendu final
+- `<PDB_ID>_aligned.cif` : Chaque structure ALK superposée au format mmCIF
+- Exemple : `2XB7_aligned.cif`, `2XBA_aligned.cif`, etc.
 
 ### Fichier de résultats
-- `superposition_results.csv` : Tableau récapitulatif avec :
-  - PDB ID
-  - Chaîne utilisée
-  - Nombre de C-alpha superposés
-  - RMSD (Å)
+- `superposition_results.csv` : Tableau récapitulatif contenant :
+  - **PDB_ID** : Identifiant de la structure
+  - **Chain** : Chaîne utilisée pour la superposition
+  - **N_CA_aligned** : Nombre de C-alpha superposés
+  - **RMSD** : Écart quadratique moyen en Ångströms
+  - **Status** : EXCELLENT, GOOD, MODERATE, HIGH_RMSD, ou ERROR
 
-## Paramètres ajustables
+## Paramètres de la superposition
 
 ### Structure de référence PKACA
-Par défaut : `1ATP`, chaîne `E`
-
-Pour changer, modifier dans le script :
-```python
-reference_pdb = "1ATP"  # Autre structure PDB de PKACA
-reference_chain = "E"   # Chaîne contenant PKACA
-```
+- **PDB ID** : 4WB8
+- **Chaîne** : A
+- **UniProt** : P17612
+- **Résolution** : 1.55 Å
+- **Référence** : Cheung et al. (2015) PNAS 112: 1374-1379
 
 ### Région du lobe C
-Par défaut : résidus 160-300
+- **Résidus** : 127-350 (228 C-alpha)
+- **Stratégie de fallback** : Si moins de 20 C-alpha sont trouvés dans cette région, le script utilise automatiquement tous les C-alpha disponibles dans la chaîne
 
-Pour ajuster :
-```python
-lobe_c_ref = f"{reference_pdb}_ref and chain {reference_chain} and resi 160-300 and name CA"
-```
+### Paramètres d'alignement
+- **Algorithme** : `cmd.align()` de PyMOL
+- **Atomes** : C-alpha uniquement (backbone)
+- **Cycles d'optimisation** : 10
+- **Cutoff** : 2.0 Å
 
 ### Critères d'évaluation
-- **RMSD > 4 Å** : Avertissement affiché (superposition problématique)
-- **N_aligned < 50** : Avertissement affiché (structure incomplète)
+- **RMSD < 2.0 Å** → Status : EXCELLENT
+- **RMSD 2.0-2.5 Å** → Status : GOOD
+- **RMSD 2.5-4.0 Å** → Status : MODERATE
+- **RMSD > 4.0 Å** → Status : HIGH_RMSD (vérification manuelle recommandée)
+- **Erreur de chargement/alignement** → Status : ERROR
+
+## Configuration visuelle
+
+Le script principal configure automatiquement l'affichage :
+- **Structure de référence (4WB8)** : vert
+- **Structures ALK** : cyan
+- **Ligands** : sticks
+- **Ions** : nb_spheres (sphères non liées)
+- **Solvant** : masqué
+
+Après visualisation, vous pouvez personnaliser :
+```python
+# Dans PyMOL
+hide everything
+show ribbon, all
+show sticks, organic
+show nb_spheres, inorganic
+zoom reference and chain A and resi 127-350
+```
 
 ## Vérification des résultats
 
-### Visuelle
-Dans PyMOL après l'exécution :
-- Structure de référence : **vert**
-- Structures ALK : **arc-en-ciel** (spectrum)
-- Représentation : cartoon pour les protéines, sticks pour les ligands
+### Vérification visuelle
+1. Charger le script de visualisation
+2. Utiliser `highlight_lobes` pour voir la région d'alignement
+3. Utiliser `isoler_mauvais` pour inspecter les structures problématiques
+4. Comparer visuellement les structures avec RMSD élevé avec la référence
 
-### Quantitative
-Vérifier dans le tableau de résultats :
-1. **RMSD** : doit être < 4 Å (idéalement < 2 Å)
-2. **N C-alpha alignés** : doit être > 50 (idéalement > 100)
+### Vérification quantitative
+Consulter `superposition_results.csv` et vérifier :
+1. **RMSD** : idéalement < 2 Å, acceptable jusqu'à 4 Å
+2. **N_CA_aligned** : devrait être > 50 (idéalement 70-80)
+3. **Status** : priorité aux structures EXCELLENT et GOOD
 
-## Problèmes courants
+### Statistiques affichées
+Le script affiche automatiquement :
+- Nombre total de structures traitées
+- Nombre de structures avec statut EXCELLENT/GOOD/MODERATE/HIGH_RMSD/ERROR
+- Distribution par catégorie de qualité
 
-### Erreur "KeyError: 'Entry ID'"
-- Le CSV a des en-têtes multiples
-- Solution déjà implémentée dans le script (lecture à partir de la ligne 2)
-
-### Erreur "fetch_mmcif not found"
-- L'extension n'est pas installée ou pas chargée
-- Vérifier le fichier `~/.pymolrc`
-- Relancer PyMOL
+## Problèmes courants et solutions
 
 ### RMSD très élevé (> 4 Å)
-- Structure non-similaire à PKACA
-- Lobe C mal défini pour cette structure
-- Vérifier visuellement la superposition
+**Causes possibles :**
+- Structure dans une conformation inactive (DFG-out vs DFG-in)
+- Présence de domaines supplémentaires perturbant l'alignement
+- Numérotation des résidus très différente
+- Structure incomplète ou fragmentaire
 
-### Peu d'atomes superposés
-- Structure incomplète
-- Région du lobe C mal définie
-- Le script bascule automatiquement sur tous les C-alpha
+**Solution :** Vérification visuelle avec `isoler_mauvais` et inspection manuelle dans PyMOL
 
-## Organisation pour le rendu
+### Peu d'atomes superposés (< 20)
+**Causes possibles :**
+- Structure incomplète (fragment du domaine kinase)
+- Lobe C partiellement absent
+- Numérotation non standard des résidus
+
+**Solution :** Le script bascule automatiquement sur tous les C-alpha disponibles
+
+### Erreur de chargement (Status: ERROR)
+**Causes possibles :**
+- Fichier mmCIF non disponible sur la PDB
+- Assemblage biologique non défini pour cette structure
+- Chaîne spécifiée incorrecte ou absente
+
+**Solution :** Vérifier manuellement sur https://www.rcsb.org/structure/<PDB_ID>
+
+### Fichiers déjà présents
+Le script vérifie automatiquement si les fichiers mmCIF existent localement avant de les télécharger, ce qui accélère considérablement les exécutions suivantes.
+
+## Organisation des fichiers
 
 ```
 Projet/
-├── open-csv.py
-├── test_superposition.py
-├── rcsb_pdb_custom_report_20260109152453.csv
-└── superposition_results.csv
+├── open_pdb_csv.py                                # Script principal
+├── visualisation.py                               # Script de visualisation
+├── rcsb_pdb_custom_report_20260110111300_new.csv  # Liste des structures
+└── superposition_results.csv                      # Résultats
 
 Super/
-├── 1ATP_ref.cif  (structure de référence PKACA)
-├── 2KUP_aligned.cif
-├── 2KUQ_aligned.cif
-├── 2YS5_aligned.cif
-└── ... (toutes les structures superposées)
+├── 4WB8-assembly1.cif                       # Référence PKACA
+├── 2XB7_aligned.cif                         # Structures superposées
+├── 2XBA_aligned.cif
+└── ... (toutes les structures *_aligned.cif)
 ```
 
 ## Stratégie du projet
 
 1. **Recherche PDB** : Structures contenant ALK (Q9UM73), assemblages biologiques uniquement
-2. **Référence** : PKACA (P17612) - structure 1ATP
+2. **Référence** : PKACA (P17612) - structure 4WB8 (haute résolution : 1.55 Å)
 3. **Superposition** : 
-   - Région ciblée : Lobe C (résidus ~160-300)
+   - Région ciblée : Lobe C (résidus 127-350)
    - Méthode : `cmd.align()` avec C-alpha uniquement
-   - Cycles d'optimisation : 5
+   - Cycles d'optimisation : 10
+   - Fallback automatique si numérotation non standard
 4. **Validation** :
-   - Visuelle : vérification dans PyMOL
+   - Visuelle : fonctions de coloration et isolation
    - Quantitative : RMSD et nombre d'atomes alignés
+   - Statistiques détaillées par catégorie
+
 
 ## Auteurs
 - Projet M2 Bioinformatique
-- Groupe 5 - ALK (Q9UM73)
+- Najat et Anaelle
